@@ -524,34 +524,3 @@ async def before_security_status():
 if __name__ == "__main__":
     bot.run(TOKEN)
 
-import os
-from flask import Flask
-from threading import Thread
-import discord
-from discord.ext import commands
-
-app = Flask('')
-
-@app.route('/')
-def home():
-    return "Bot is running 24/7!"
-
-def run():
-    # Lấy cổng tự động từ Render qua biến môi trường PORT, nếu không có thì mặc định dùng 8080
-    port = int(os.environ.get("PORT", 8080))
-    app.run(host='0.0.0.0', port=port)
-
-def keep_alive():
-    t = Thread(target=run)
-    t.start()
-
-keep_alive()
-
-intents = discord.Intents.default()
-intents.message_content = True
-bot = commands.Bot(command_prefix="!", intents=intents)
-
-@bot.event
-async def on_ready():
-    print(f'Logged in as {bot.user}')
-
