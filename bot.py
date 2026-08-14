@@ -523,3 +523,44 @@ async def before_security_status():
 # -----------------------------
 if __name__ == "__main__":
     bot.run(TOKEN)
+
+import os
+from flask import Flask
+from threading import Thread
+import discord
+from discord.ext import commands
+
+# --- PHẦN 1: TẠO WEB SERVER ĐỂ RENDER KHÔNG TỰ ĐỘNG TẮT (TIMED OUT) ---
+app = Flask('')
+
+@app.route('/')
+def home():
+    return "Bot is running 24/7!"
+
+def run():
+    app.run(host='0.0.0.0', port=8080)
+
+def keep_alive():
+    t = Thread(target=run)
+    t.start()
+
+# Kích hoạt chạy web server ngầm
+keep_alive()
+
+# --- PHẦN 2: CODE BOT DISCORD CỦA BẠN ---
+intents = discord.Intents.default()
+intents.message_content = True
+bot = commands.Bot(command_prefix="!", intents=intents)
+
+@bot.event
+async def on_ready():
+    print(f'Logged in as {bot.user} (ID: {bot.user.id})')
+    print('------')
+
+# Bạn có thể thêm các lệnh/sự kiện của bot ở đây
+@bot.command()
+async def ping(ctx):
+    await ctx.send("Pong! Bot vẫn đang chạy 24/7 ngon lành đây! 🚀")
+
+# Chạy bot bằng biến môi trường DISCORD_TOKEN trên Render
+bot.run(os.getenv("DISCORD_TOKEN"))
